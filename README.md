@@ -1,2 +1,2 @@
-# projectn-bolt-php-gcf-code-samples
-Project N Bolt PHP Code Samples for Cloud Storage and Google Cloud Function
+# projectn-bolt-gcs-gcf-nodejs-code-samples
+Project N Bolt GCS, GCF code samples for PHP
