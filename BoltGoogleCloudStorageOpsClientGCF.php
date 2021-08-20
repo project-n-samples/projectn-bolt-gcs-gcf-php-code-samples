@@ -1,10 +1,10 @@
 <?php
 
-require "BoltGoogleCloudStorageOpsClient.php";
+include_once "boltGoogleCloudStorageOpsClient.php";
 
 use Psr\Http\Message\ServerRequestInterface;
 
-function BoltGoogleCloudStorageOpsClient(ServerRequestInterface $request): void
+function boltGoogleCloudStorageOpsClient(ServerRequestInterface $request): void
 {
   $body = $request->getBody()->getContents();
   $event = !empty($body) ? json_decode($body, true) : $request->getQueryParams();

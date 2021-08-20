@@ -2,6 +2,8 @@
 
 use Google\Cloud\Storage\StorageClient;
 
+include_once "commonFunctions.php";
+
 /**
  * Enum SdkTypes
  */
@@ -30,45 +32,20 @@ abstract class RequestType
   const GetObjectPassthroughTTFB = "GET_OBJECT_PASSTHROUGH_TTFB"; // This is only for Perf
   const All = "ALL"; // This is only for Perf
 }
-
 class BoltGoogleCloudStorageOpsClient
 {
   function __construct()
   {
   }
 
-  function getBoltRegion()
-  {
-    $curl = curl_init();
-    $headers = ['Metadata-Flavor: Google'];
-    curl_setopt($curl, CURLOPT_URL, "http://metadata.google.internal/computeMetadata/v1/instance/zone");
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-    $data = curl_exec($curl);
-    curl_close($curl);
-
-    $parts = explode("/", $data);
-    $zone = end($parts);
-    $region = strpos($zone, '-')
-      ? substr($zone, 0, strrpos($zone, '-'))
-      : $zone;
-
-    return $region;
-  }
-
-  function getBoltURL()
-  {
-    return str_replace("{region}", $this->getBoltRegion(), $_ENV["BOLT_URL"]);
-  }
-
   function processEvent($event)
   {
     $event["sdkType"] = $event["sdkType"] ? strtoupper($event["sdkType"]) : $event["sdkType"];
     $event["requestType"] = $event["requestType"] ? strtoupper($event["requestType"]) : $event["requestType"];
-    printf("event: " . json_encode($event, JSON_PRETTY_PRINT) . PHP_EOL);
+    info_log("event: " . json_encode($event, JSON_PRETTY_PRINT) . PHP_EOL);
 
     $client = $event["sdkType"] === SdkTypes::Bolt
-      ? new StorageClient(["apiEndpoint" => $this->getBoltURL()])
+      ? new StorageClient(["apiEndpoint" => getBoltURL()])
       : new StorageClient();
 
     switch ($event["requestType"]) {
