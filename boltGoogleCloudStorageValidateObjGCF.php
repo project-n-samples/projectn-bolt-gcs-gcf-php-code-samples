@@ -22,7 +22,7 @@ function boltGcsValidateObjGcfEntry(ServerRequestInterface $request): void
 
   // Get object using Bolt
   $event["requestType"] = RequestType::GetObject;
-  $event["sdkType"] = SdkTypes::GCS;
+  $event["sdkType"] = SdkTypes::Bolt;
   $boltGetObjectResponse = $opsClient->processEvent($event);
 
   $jsonResponse = json_decode('{}');
