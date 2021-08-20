@@ -5,7 +5,7 @@ include_once "boltGoogleCloudStorageOpsClient.php";
 use Psr\Http\Message\ServerRequestInterface;
 
 // Here 
-function boltGoogleCloudStorageValidateObj(ServerRequestInterface $request): void
+function boltGcsValidateObjGcfEntry(ServerRequestInterface $request): void
 {
   $body = $request->getBody()->getContents();
   $event = !empty($body) ? json_decode($body, true) : $request->getQueryParams();
