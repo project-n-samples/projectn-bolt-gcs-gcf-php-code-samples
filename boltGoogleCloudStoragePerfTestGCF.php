@@ -16,7 +16,7 @@ function boltGcsPerfTestGcfEntry(ServerRequestInterface $request): void
   $opsClient = new BoltGoogleCloudStorageOpsClient();
 
   $getPerfStats = function ($requestType) use ($event, $opsClient) {
-    $maxKeys = $event["maxKeys"]
+    $maxKeys = isset($event["maxKeys"])
       ? ((int)$event["maxKeys"] <= 1000
         ? (int)$event["maxKeys"]
         : 1000)
@@ -101,8 +101,12 @@ function boltGcsPerfTestGcfEntry(ServerRequestInterface $request): void
     return $gcsAndBoltPerfStats;
   };
 
-  $event["sdkType"] = $event["sdkType"] ? strtoupper($event["sdkType"]) : $event["sdkType"];
-  $event["requestType"] = $event["requestType"] ? strtoupper($event["requestType"]) : $event["requestType"];
+  if (isset($event["sdkType"])) {
+    $event["sdkType"] =  strtoupper($event["sdkType"]);
+  }
+  if (isset($event["requestType"])) {
+    $event["requestType"] =  strtoupper($event["requestType"]);
+  }
   info_log("PerfTest -> event: " . json_encode($event, JSON_PRETTY_PRINT) . PHP_EOL);
 
   $perfStats = json_decode("{}");

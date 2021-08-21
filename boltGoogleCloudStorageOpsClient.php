@@ -40,11 +40,15 @@ class BoltGoogleCloudStorageOpsClient
 
   function processEvent($event)
   {
-    $event["sdkType"] = $event["sdkType"] ? strtoupper($event["sdkType"]) : $event["sdkType"];
-    $event["requestType"] = $event["requestType"] ? strtoupper($event["requestType"]) : $event["requestType"];
+    if (isset($event["sdkType"])) {
+      $event["sdkType"] =  strtoupper($event["sdkType"]);
+    }
+    if (isset($event["requestType"])) {
+      $event["requestType"] =  strtoupper($event["requestType"]);
+    }
     info_log("event: " . json_encode($event, JSON_PRETTY_PRINT) . PHP_EOL);
 
-    $client = $event["sdkType"] === SdkTypes::Bolt
+    $client = isset($event["sdkType"]) && $event["sdkType"] === SdkTypes::Bolt
       ? new StorageClient(["apiEndpoint" => getBoltURL()])
       : new StorageClient();
 
