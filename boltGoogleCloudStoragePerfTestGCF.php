@@ -41,7 +41,7 @@ function boltGcsPerfTestGcfEntry(ServerRequestInterface $request): void
         : array_slice($opsClient->processEvent(array_merge($event, [
           "requestType" => RequestType::ListObjects,
           "sdkType" => SdkTypes::GCS
-        ]))->objects ?? [], $maxKeys)); // Fetch keys from buckets (GoogleCloudStorage/Bolt) for GET related performace tests
+        ]))->objects ?? [], 0, $maxKeys)); // Fetch keys from buckets (GoogleCloudStorage/Bolt) for GET related performace tests
 
     // Run performance stats for given sdkType either GoogleCloudStorage or Bolt
     $runFor = function ($sdkType) use ($event, $keys, $opsClient, $requestType, $generateRandomValue) {
