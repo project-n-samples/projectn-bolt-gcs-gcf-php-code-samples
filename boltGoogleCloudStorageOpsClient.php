@@ -60,9 +60,11 @@ class BoltGoogleCloudStorageOpsClient
       case RequestType::UploadObject:
         return $this->uploadObject($client, $event["bucket"], $event["key"], $event["value"]);
       case RequestType::DownloadObject:
-        return $this->downloadObject($client, $event["bucket"], $event["key"]);
+        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStat"] === "true" || $event["isForStats"] === true);
       case RequestType::GetObject:
-        return $this->downloadObject($client, $event["bucket"], $event["key"]);
+        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStat"] === "true" || $event["isForStats"] === true);
+      case RequestType::GetObjectTTFB:
+        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStat"] === "true" || $event["isForStats"] === true, true);
       case RequestType::DeleteObject:
         return $this->deleteObject($client, $event["bucket"], $event["key"]);
     }
@@ -184,7 +186,7 @@ class BoltGoogleCloudStorageOpsClient
     return $needle === "" || (substr($haystack, -strlen($needle)) === $needle);
   }
 
-  function downloadObject($client, $bucketName, $objectName)
+  function downloadObject($client, $bucketName, $objectName, $isForStats, $timeToFirstByte = false)
   {
     $bucket = $client->bucket($bucketName);
     $object = $bucket->object($objectName);
@@ -196,15 +198,21 @@ class BoltGoogleCloudStorageOpsClient
       $contentEncoding == "gzip" || $this->endsWith($objectName, ".gz");
 
     $stream = $object->downloadAsStream();
-
     $contents = $stream->getContents();
 
     $hash = $isObjectCompressed ?
       md5(gzdecode($contents)) : md5($contents);
 
     $jsonResponse = json_decode('{}');
-
     $jsonResponse->md5 = $hash;
+    if ($isForStats) {
+      if (isset($info['size'])) {
+        $jsonResponse->contentLength = $info['size'];
+      }
+      if ($isObjectCompressed) {
+        $jsonResponse->isObjectCompressed = true;
+      }
+    }
 
     return $jsonResponse;
   }
