@@ -64,11 +64,11 @@ class BoltGoogleCloudStorageOpsClient
       case RequestType::UploadObject:
         return $this->uploadObject($client, $event["bucket"], $event["key"], $event["value"]);
       case RequestType::DownloadObject:
-        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStat"] === "true" || $event["isForStats"] === true);
       case RequestType::GetObject:
-        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStat"] === "true" || $event["isForStats"] === true);
       case RequestType::GetObjectTTFB:
-        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStat"] === "true" || $event["isForStats"] === true, true);
+      case RequestType::GetObjectPassthrough:
+      case RequestType::GetObjectPassthroughTTFB:
+        return $this->downloadObject($client, $event["bucket"], $event["key"], $event["isForStats"] === "true" || $event["isForStats"] === true, in_array($event["requestType"], [RequestType::GetObjectTTFB, RequestType::GetObjectPassthroughTTFB]));
       case RequestType::DeleteObject:
         return $this->deleteObject($client, $event["bucket"], $event["key"]);
     }
