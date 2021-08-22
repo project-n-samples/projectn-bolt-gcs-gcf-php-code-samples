@@ -202,10 +202,17 @@ class BoltGoogleCloudStorageOpsClient
     $isObjectCompressed =
       $contentEncoding == "gzip" || $this->endsWith($objectName, ".gz");
 
-    $stream = $object->downloadAsStream();
+    // https://googleapis.github.io/google-cloud-php/#/docs/google-cloud/v0.134.0/storage/storageobject?method=downloadAsStream
+    $stream = $timeToFirstByte ? $object->downloadAsStream([
+      'restOptions' => [
+        'headers' => [
+          'Range' => "bytes=0-0"
+        ]
+      ]
+    ]) : $object->downloadAsStream();
     $contents = $stream->getContents();
 
-    $hash = $isObjectCompressed ?
+    $hash = ($isObjectCompressed && !$timeToFirstByte) ?
       md5(gzdecode($contents)) : md5($contents);
 
     $jsonResponse = json_decode('{}');
