@@ -93,7 +93,6 @@ class BoltGoogleCloudStorageOpsClient
     foreach ($bucket->objects($options) as $object) {
       $objects[] = $object->name();
     }
-    info_log("================================================================objects count---:" . count($objects) . PHP_EOL); //TODO:
     $jsonResponse = json_decode('{}');
     $jsonResponse->objects = $objects;
     return $jsonResponse;
