@@ -56,7 +56,7 @@ class BoltGoogleCloudStorageOpsClient
       case RequestType::ListBuckets:
         return $this->listBuckets($client);
       case RequestType::ListObjects:
-        return $this->listObjects($client, $event["bucket"]);
+        return $this->listObjects($client, $event["bucket"], $event["maxKeys"]);
       case RequestType::GetBucketMetadata:
         return $this->getBucketMetadata($client, $event["bucket"]);
       case RequestType::GetObjectMetadata:
@@ -85,13 +85,15 @@ class BoltGoogleCloudStorageOpsClient
     return $jsonResponse;
   }
 
-  function listObjects($client, $bucketName)
+  function listObjects($client, $bucketName, $maxKeys = 1000)
   {
     $bucket = $client->bucket($bucketName);
     $objects = array();
-    foreach ($bucket->objects() as $object) {
+    $options = ['maxResults' => (int)$maxKeys, 'resultLimit' => (int)$maxKeys];
+    foreach ($bucket->objects($options) as $object) {
       $objects[] = $object->name();
     }
+    info_log("================================================================objects count---:" . count($objects) . PHP_EOL); //TODO:
     $jsonResponse = json_decode('{}');
     $jsonResponse->objects = $objects;
     return $jsonResponse;
